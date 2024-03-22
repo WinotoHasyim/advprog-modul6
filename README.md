@@ -19,3 +19,21 @@
 4. The browser signals the end of an HTTP request by sending two newline characters in a row. The function reads lines until it gets an empty line, which signifies the end of the HTTP headers.
 
 5. The function prints out the contents of `http_request`.
+
+### Commit 2 Reflection notes
+
+#### What does the new `handle_connection` do?
+
+The handle_connection function now reads the contents of an HTML file and includes it in the HTTP response. 
+
+1. Firstly, we prepare an HTTP response. It starts with a status line indicating a successful response (`HTTP/1.1 200 OK`).
+
+2. The `contents` variable reads the contents of the file `hello.html` into a string.
+
+3. After that, we try to get the contents' length, which will be used to set the `Content-Length` header in the HTTP response.
+
+4. The function then creates the full HTTP response. It includes the status line, a Content-Length header indicating the size of the response body, and the contents of `hello.html` as the body of the response.
+
+5. Finally, the function writes the response to the `TcpStream`.
+
+![Commit 2 screen capture](/assets/images/commit2.png)
