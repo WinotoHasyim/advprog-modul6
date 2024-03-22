@@ -60,3 +60,11 @@ In the `handle_connection` function above, the `if` and `else` blocks have a lot
 
 ![Commit 2 screen capture](/assets/images/commit3-2.png)
 
+### Commit 4 Reflection notes
+
+#### Simulation of slow request
+
+The function checks the request line and matches it against several patterns. It uses a `match` expression, which is like a more powerful version of an `if` statement that can check for multiple conditions. If the request is a `GET` request for the root path (`/`), it prepares a successful HTTP response and sets the `filename` to `hello.html`. If the request is a `GET` request for the `/sleep` path, it makes the thread sleep for 10 seconds to simulate a slow response, then prepares a successful HTTP response and sets the `filename` to `hello.html`. For any other request, it prepares a `404 Not Found` response and sets the `filename` to `404.html`.
+
+If we run the server and make a request to `http://127.0.0.1:7878/sleep`, we’ll notice that the server waits for 10 seconds before responding. During this time, if we make a request to `http://127.0.0.1:7878/`, you’ll see that this request also has to wait until the server has finished handling the `/sleep` request. This demonstrates how a slow-processing request can affect other requests in a single-threaded server.
+
