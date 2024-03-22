@@ -73,3 +73,13 @@ If we run the server and make a request to `http://127.0.0.1:7878/sleep`, we’l
 #### How does the ThreadPool works
 
 The `ThreadPool` is a pool of worker threads that can execute tasks concurrently. When we create a new `ThreadPool` with `ThreadPool::new(size)`, it creates a number of worker threads equal to `size`. It also creates a channel for sending jobs (tasks) to the workers. The `receiver` end of the channel is wrapped in an `Arc` and a `Mutex` to allow safe, concurrent access from multiple threads. Each `Worker` is created with an ID and a thread. The thread runs in a loop, constantly trying to receive a `Job` from the `receiver`. When it gets a job, it executes it. Then, when we call `ThreadPool::execute(f)`, it sends the job `f` to the workers via the sender end of the channel. One of the workers will receive the job and execute it.
+
+### Commit Bonus Reflection notes
+
+#### Comparison between `new` and `build` function
+
+The main difference between the `new` function and the `build` function is how they handle the case when the `ThreadPool` size is 0.
+
+- The `new` function uses the `assert!` macro to panic if `size` is zero. This immediately stops the program with an error message. Using this approach gives the caller less control over what to do when the `size` is 0.
+
+- The `build` function returns a `Result`. If `size` is zero, it returns an `Err(PoolCreationError)` with a message indicating that the size must be greater than zero. This approach allows the caller to handle the error in a more flexible way, like for example, logging a predefined error message and exiting the program.

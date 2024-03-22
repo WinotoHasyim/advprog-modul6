@@ -1,7 +1,24 @@
 use std::{
     sync::{mpsc, Arc, Mutex},
     thread,
+    fmt,
 };
+
+pub struct PoolCreationError {
+    message: String,
+}
+
+impl fmt::Display for PoolCreationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl fmt::Debug for PoolCreationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
 
 pub struct ThreadPool {
     workers: Vec<Worker>,
@@ -11,15 +28,12 @@ pub struct ThreadPool {
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
 impl ThreadPool {
-    /// Create a new ThreadPool.
-    ///
-    /// The size is the number of threads in the pool.
-    ///
-    /// # Panics
-    ///
-    /// The `new` function will panic if the size is zero.
-    pub fn new(size: usize) -> ThreadPool {
-        assert!(size > 0);
+    pub fn build(size: usize) -> Result<ThreadPool, PoolCreationError> {
+        if size == 0 {
+            return Err(PoolCreationError {
+                message: String::from("Size must be greater than 0"),
+            });
+        }
 
         let (sender, receiver) = mpsc::channel();
 
@@ -31,9 +45,8 @@ impl ThreadPool {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
         }
 
-        ThreadPool { workers, sender }
+        Ok(ThreadPool { workers, sender })
     }
-
 
     pub fn execute<F>(&self, f: F)
     where
