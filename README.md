@@ -68,3 +68,8 @@ The function checks the request line and matches it against several patterns. It
 
 If we run the server and make a request to `http://127.0.0.1:7878/sleep`, we’ll notice that the server waits for 10 seconds before responding. During this time, if we make a request to `http://127.0.0.1:7878/`, you’ll see that this request also has to wait until the server has finished handling the `/sleep` request. This demonstrates how a slow-processing request can affect other requests in a single-threaded server.
 
+### Commit 5 Reflection notes
+
+#### How does the ThreadPool works
+
+The `ThreadPool` is a pool of worker threads that can execute tasks concurrently. When we create a new `ThreadPool` with `ThreadPool::new(size)`, it creates a number of worker threads equal to `size`. It also creates a channel for sending jobs (tasks) to the workers. The `receiver` end of the channel is wrapped in an `Arc` and a `Mutex` to allow safe, concurrent access from multiple threads. Each `Worker` is created with an ID and a thread. The thread runs in a loop, constantly trying to receive a `Job` from the `receiver`. When it gets a job, it executes it. Then, when we call `ThreadPool::execute(f)`, it sends the job `f` to the workers via the sender end of the channel. One of the workers will receive the job and execute it.
